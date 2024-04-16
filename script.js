@@ -10,7 +10,7 @@ const RARITY = {
   3: "Rare",
   4: "Elite",
   5: "Super Rare/Priority",
-  6: "Decisive"
+  6: "Ultra Rare/Decisive"
 };
 
 const NATIONALITY = {
@@ -36,10 +36,12 @@ const NATIONALITY = {
   110: "Senran Kagura",
 };
 
+let shipTable; // Declare shipTable globally to access it from resetSort function
+
 loadShipData().then(([ships, types]) => {
   const shipDataSection = document.getElementById('ship-data');
 
-  const shipTable = document.createElement('table');
+  shipTable = document.createElement('table');
   const shipTableBody = document.createElement('tbody'); // Создаем тело таблицы
 
   // Create table header row
@@ -114,6 +116,14 @@ loadShipData().then(([ships, types]) => {
       const sortedRows = sortDirection[sortState[headerText]] === 1 ? [...activeRows, ...inactiveRows] : [...inactiveRows, ...activeRows];
       shipTableBody.innerHTML = ''; // Очищаем тело таблицы
       sortedRows.forEach(row => shipTableBody.appendChild(row)); // Добавляем отсортированные строки обратно
+    } else if (headerText === "Rarity") {
+      rows.sort((a, b) => {
+        const cellA = a.cells[columnIndex].textContent.trim();
+        const cellB = b.cells[columnIndex].textContent.trim();
+        return sortDirection[sortState[headerText]] * compareRarity(cellA, cellB);
+      });
+      shipTableBody.innerHTML = ''; // Очищаем тело таблицы
+      rows.forEach(row => shipTableBody.appendChild(row)); // Добавляем отсортированные строки обратно
     } else {
       rows.sort((a, b) => {
         const cellA = a.cells[columnIndex].textContent.trim();
@@ -124,6 +134,36 @@ loadShipData().then(([ships, types]) => {
       rows.forEach(row => shipTableBody.appendChild(row)); // Добавляем отсортированные строки обратно
     }
   }
+
+  function compareRarity(rarityA, rarityB) {
+    const rarityOrder = {
+      "Common": 2,
+      "Rare": 3,
+      "Elite": 4,
+      "Super Rare/Priority": 5,
+      "Ultra Rare/Decisive": 6
+    };
+    return rarityOrder[rarityA] - rarityOrder[rarityB];
+  }
+
+  function resetSort() {
+    // Reset sort indicators
+    const indicators = document.querySelectorAll('.sort-indicator');
+    indicators.forEach(indicator => {
+      indicator.textContent = '';
+    });
+
+    // Reset sort state
+    for (const headerText in sortState) {
+      sortState[headerText] = 'none';
+    }
+
+    // Re-append rows to restore original order
+    const rows = Array.from(shipTableBody.rows);
+    rows.forEach(row => shipTableBody.appendChild(row));
+  }
+
+  document.getElementById('reset-sort').addEventListener('click', resetSort);
 
   for (const shipId in ships) {
     const ship = ships[shipId];
