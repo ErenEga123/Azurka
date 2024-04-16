@@ -1,0 +1,20 @@
+/* Basic styling - customize as needed */
+#ship-data {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ship-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 5px;
+}
